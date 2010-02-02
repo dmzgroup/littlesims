@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dmz>
+<version>
+   <name value="Little Sims"/>
+   <major value="X"/>
+   <minor value="X"/>
+   <bug value="X"/>
+   <build value="INTERNAL BUILD"/>
+   <image value="./assets/DMZ-Icon.png"/>
+</version>
+</dmz>

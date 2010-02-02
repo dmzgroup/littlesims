@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dmz>
+<plugin-list>
+   <plugin name="dmzLuaModuleBasic"/>
+   <!-- <plugin name="dmzQtPluginLuaProfiler"/> -->
+</plugin-list>
+<dmzLuaModuleBasic>
+   <path value="./scripts"/>
+   <plugin-list>
+      <plugin name="dmzLuaExtObject"/>
+      <plugin name="dmzQtExtLuaConsole"/>
+   </plugin-list>
+</dmzLuaModuleBasic>
+</dmz>

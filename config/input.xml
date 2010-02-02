@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dmz>
+<plugin-list>
+   <plugin name="dmzInputModuleBasic"/>
+   <plugin name="dmzInputPluginExit"/>
+   <plugin name="dmzInputPluginKeyEventToMessage"/>
+</plugin-list>
+<dmzInputPluginKeyEventToMessage>
+   <channel>
+      <converter key="L">
+         <target name="dmzQtExtLuaConsole" message="DMZ_Show_Lua_Console"/>
+      </converter>
+   </channel>
+</dmzInputPluginKeyEventToMessage>
+</dmz>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dmz>
+<runtime>
+<resource-map>
+   <search>
+      <path value="./assets/"/>
+   </search>
+   <resource name="chip" file="chip.png"/>
+</resource-map>
+</runtime>
+</dmz>
