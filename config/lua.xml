@@ -6,6 +6,7 @@
 </plugin-list>
 <dmzLuaModuleBasic>
    <path value="./scripts"/>
+   <instance name="littlesims"/>
    <plugin-list>
       <plugin name="dmzLuaExtObject"/>
       <plugin name="dmzQtExtLuaConsole"/>

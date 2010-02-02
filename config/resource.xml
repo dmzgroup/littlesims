@@ -5,7 +5,9 @@
    <search>
       <path value="./assets/"/>
    </search>
-   <resource name="chip" file="chip.png"/>
+   <resource name="small node" file="circle.png"/>
+   <resource name="medium node" file="square.png"/>
+   <resource name="large node" file="star.png"/>
 </resource-map>
 </runtime>
 </dmz>

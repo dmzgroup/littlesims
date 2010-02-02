@@ -1,35 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <dmz>
 <plugin-list>
-   <plugin name="dmzQtModuleMainWindowBasic"/>
-   <plugin name="dmzQtModuleCanvasBasic"/>
-   <plugin name="dmzQtPluginCanvasObject"/>
+   <plugin name="dmzQtModuleMainWindowBasic" scope="main-window"/>
+   <plugin name="dmzQtModuleCanvasBasic" unique="canvas"/>
+   <plugin name="dmzQtPluginCanvasObject" unique="canvas-object"/>
    <plugin name="dmzQtPluginVersion"/>
 </plugin-list>
-<dmzQtPluginCanvasZoomPan>
-   <zoom default="0.1" min="0.1" max="1.0"/>
-   <hide value="true"/>
-</dmzQtPluginCanvasZoomPan>
-<dmzQtModuleMainWindowBasic>
+<main-window>
    <fixed-size x="600" y="600"/>
    <corners>
       <top right="true" left="true"/>
       <bottom right="true" left="true"/>
    </corners>
    <window title="DMZ: Little Sims"/>
-   <central-widget name="dmzQtModuleCanvasBasic"/>
-   <dock-windows>
-      <group area="right">
-         <widget name="controls" title="Controls">
-            <allowed-areas left="true" right="true"/>
-         </widget>
-      </group>
-      <group area="bottom">
-         <widget name="graph" title="Chip Clusters"/>
-      </group>
-   </dock-windows>
-</dmzQtModuleMainWindowBasic>
-<dmzQtModuleCanvasBasic>
+   <central-widget name="canvas"/>
+</main-window>
+<canvas>
    <frame>
       <widget>
          <minimum-size width="600" height="600"/>
@@ -44,13 +30,13 @@
       <max x="300" y="300"/>
    </scene>
    <scrollbars value="false"/>
-</dmzQtModuleCanvasBasic>
-<dmzQtPluginCanvasObject>
+</canvas>
+<canvas-object>
    <plugin-list>
-      <plugin name="dmzQtPluginCanvasObjectBasic"/>
+      <plugin name="dmzQtPluginCanvasObjectBasic" unique="canvas-object-basic"/>
    </plugin-list>
-   <dmzQtPluginCanvasObjectBasic>
+   <canvas-object-basic>
       <defaults zValue="1" itemIgnoresTransformations="false"/>
-   </dmzQtPluginCanvasObjectBasic>
-</dmzQtPluginCanvasObject>
+   </canvas-object-basic>
+</canvas-object>
 </dmz>

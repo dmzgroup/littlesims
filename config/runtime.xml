@@ -4,5 +4,37 @@
    <time>
       <frequency value="60.0"/>
    </time>
+   <state name="LS_Small"/>
+   <state name="LS_Medium"/>
+   <state name="LS_Large"/>
+   <object-type name="ls_node">
+      <canvas-object/>
+      <canvas-object-basic>
+         <items>
+            <group name="base node">
+               <image name="small" resource="small node">
+                  <translate x="-9" y="-9"/>
+               </image>
+               <image name="medium" resource="medium node">
+                  <translate x="-10" y="-10"/>
+               </image>
+               <image name="large" resource="large node">
+                  <translate x="-16" y="-16"/>
+               </image>
+            </group>
+         </items>
+         <switch>
+            <state group="base node">
+               <item name="small"/>
+            </state>
+            <state name="LS_Medium" group="base node">
+               <item name="medium"/>
+            </state>
+            <state name="LS_Large" group="base node">
+               <item name="large"/>
+            </state>
+         </switch>
+      </canvas-object-basic>
+   </object-type>
 </runtime>
 </dmz>
