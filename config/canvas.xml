@@ -4,7 +4,6 @@
    <plugin name="dmzQtModuleMainWindowBasic"/>
    <plugin name="dmzQtModuleCanvasBasic"/>
    <plugin name="dmzQtPluginCanvasObject"/>
-   <plugin name="dmzQtPluginCanvasZoomPan"/>
    <plugin name="dmzQtPluginVersion"/>
 </plugin-list>
 <dmzQtPluginCanvasZoomPan>
@@ -12,6 +11,7 @@
    <hide value="true"/>
 </dmzQtPluginCanvasZoomPan>
 <dmzQtModuleMainWindowBasic>
+   <fixed-size x="600" y="600"/>
    <corners>
       <top right="true" left="true"/>
       <bottom right="true" left="true"/>
@@ -32,15 +32,18 @@
 <dmzQtModuleCanvasBasic>
    <frame>
       <widget>
-         <minimum-size width="550" height="550"/>
+         <minimum-size width="600" height="600"/>
       </widget>
    </frame>
-   <canvas opengl="true" antialiasing="true" textantialiasing="true"/>
+   <canvas opengl="true" antialiasing="true" textantialiasing="true">
+      <zoom default="1.0"/>
+   </canvas>
    <scene>
-      <min x="-2500" y="-2500"/>
-      <max x="2500" y="2500"/>
+      <background grid="false"/>
+      <min x="-300" y="-300"/>
+      <max x="300" y="300"/>
    </scene>
-   <scrollbars value="true"/>
+   <scrollbars value="false"/>
 </dmzQtModuleCanvasBasic>
 <dmzQtPluginCanvasObject>
    <plugin-list>
