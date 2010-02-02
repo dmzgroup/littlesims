@@ -6,6 +6,6 @@
    <minor value="X"/>
    <bug value="X"/>
    <build value="INTERNAL BUILD"/>
-   <image value="./assets/DMZ-Splash.png"/>
+   <image value="./assets/DMZ-Version.png"/>
 </version>
 </dmz>
