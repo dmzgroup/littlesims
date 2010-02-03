@@ -7,6 +7,9 @@
    <state name="LS_Small"/>
    <state name="LS_Medium"/>
    <state name="LS_Large"/>
+   <object-type name="ls_link">
+      <canvas-object/>
+   </object-type>
    <object-type name="ls_node">
       <canvas-object/>
       <canvas-object-basic>

@@ -4,6 +4,8 @@
    <plugin name="dmzQtModuleMainWindowBasic" scope="main-window"/>
    <plugin name="dmzQtModuleCanvasBasic" unique="canvas"/>
    <plugin name="dmzQtPluginCanvasObject" unique="canvas-object"/>
+   <plugin name="dmzQtPluginCanvasLink" unique="canvas-link"/>
+   <plugin name="dmzQtPluginGraph" unique="degree-graph"/>
    <plugin name="dmzQtPluginVersion"/>
 </plugin-list>
 <main-window>
@@ -14,6 +16,13 @@
    </corners>
    <window title="DMZ: Little Sims"/>
    <central-widget name="canvas"/>
+   <dock-windows>
+      <group area="bottom">
+         <widget name="degree-graph" title="Degree Graph" visible="true" floating="true">
+            <allowed-areas none="true"/>
+         </widget>
+      </group>
+   </dock-windows>
 </main-window>
 <canvas>
    <frame>
@@ -39,4 +48,21 @@
       <defaults zValue="1" itemIgnoresTransformations="false"/>
    </canvas-object-basic>
 </canvas-object>
+<degree-graph>
+   <start value="1"/>
+   <ascending value="true"/>
+   <percents show="true"/>
+   <set>
+      <object-type name="ls_node"/>
+   </set>
+   <attribute type="link" name="Node_Link"/>
+   <bar>
+      <stroke>
+         <color green="0.1"/>
+      </stroke>
+      <fill>
+         <color red="0.0" green="0.9" blue="0.0"/>
+      </fill>
+   </bar>
+</degree-graph>
 </dmz>
