@@ -4,6 +4,7 @@
    <time>
       <frequency value="120.0"/>
    </time>
+   <message name="Activate_Simulation_Message" monostate="true"/>
    <message name="Update_Node_Count_Message" monostate="true"/>
    <message name="Update_Link_Count_Message" monostate="true"/>
    <state name="LS_Small"/>

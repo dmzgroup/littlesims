@@ -34,7 +34,7 @@
          <minimum-size width="600" height="600"/>
       </widget>
    </frame>
-   <canvas opengl="true" antialiasing="true" textantialiasing="true">
+   <canvas opengl="false" antialiasing="true" textantialiasing="true">
       <zoom default="1.0"/>
    </canvas>
    <scene>
