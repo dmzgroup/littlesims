@@ -161,7 +161,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="resetButton">
+      <widget class="QToolButton" name="resetButton">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
          <horstretch>0</horstretch>
