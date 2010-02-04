@@ -1,0 +1,5 @@
+require "qtshell"
+
+qtshell.set_up ("littlesims")
+lmk.add_files ({"littlesims.rc"}, {win32 = true})
+

@@ -2,5 +2,10 @@
 <dmz>
 <plugin-list>
    <plugin name="dmzObjectModuleBasic"/>
+   <plugin name="dmzPluginSaveMessageMonostate" scope="save-preferences"/>
 </plugin-list>
+<save-preferences>
+   <message name="Update_Node_Count_Message"/>
+   <message name="Update_Link_Count_Message"/>
+</save-preferences>
 </dmz>

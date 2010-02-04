@@ -1,0 +1,9 @@
+require "lmkQt"
+lmkQt.set_name "dmzLittlesimsPluginControlsQt"
+lmk.set_type "plugin"
+lmk.add_files {"Controls.ui",}
+lmk.add_files ({"dmzLittlesimsPluginControlsQt.h",}, {src="moc",})
+lmk.add_files {"dmzLittlesimsPluginControlsQt.cpp",}
+lmk.add_libs {"dmzQtUtil", "dmzKernel",}
+lmk.add_preqs {"dmzQtFramework",}
+lmkQt.add_libs {"QtGui", "QtCore",}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest>
+   <config file="config/resource.xml"/>
+   <config file="config/runtime.xml"/>
+   <config file="config/common.xml"/>
+   <config file="config/canvas.xml"/>
+   <config file="config/input.xml"/>
+   <config file="config/lua.xml"/>
+   <config file="config/version.xml"/>
+</manifest>

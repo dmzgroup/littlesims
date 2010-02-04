@@ -13,6 +13,10 @@ local function local_random (min, max, offset)
    return math.floor (result)
 end
 
+local function radius_position (angle)
+   return dmz.vector.new (math.sin (angle) * 280, 0, math.cos (angle) * 280)
+end
+
 local function random_position (self)
    local x, y = 0, 0
    local done = false
@@ -60,9 +64,73 @@ local function clear_canvas (self)
    self.index = {}
    self.links = {}
    self.grid = nil
+   local maxLinks = math.floor ((self.objectCount - 1) * 0.5 * self.objectCount * 0.8)
+   if self.linkCount > maxLinks then
+      self.linkCount = maxLinks
+      local data = dmz.data.new ()
+      data:store_number ("Float64", 1, self.linkCount)
+      self.updateLinkCountMessage:send (nil, data)
+   end
+end
+
+local function init_scalefree (self)
+   clear_canvas (self)
+   local offset = dmz.math.TwoPi / self.objectCount
+   for v = 1, self.objectCount, 1 do
+      local obj = dmz.object.create (NodeType)
+      dmz.object.position (obj, nil, radius_position (v * offset))
+      dmz.object.state (obj, nil, SmallState)
+      self.index[v] = { handle = obj, links = 0 }
+      self.objects[obj] = self.index[v]
+      dmz.object.activate (obj)
+      dmz.object.set_temporary (obj)
+   end
+   for v = 1, self.linkCount, 1 do
+      local obj1 = math.random (self.objectCount)
+      local obj2 = math.random (self.objectCount)
+      if obj1 ~= obj2 then
+         obj1 = self.index[obj1].handle
+         obj2 = self.index[obj2].handle
+
+         if not is_linked (obj1, obj2) then
+            self.links[#self.links + 1] = dmz.object.link (NodeLinkHandle, obj1, obj2)
+         end
+      end
+   end
+end
+
+local function update_scalefree (self)
+   local place = math.random (#self.links)
+   local link = self.links[place]
+   if link then
+      local attr, obj1, obj2 = dmz.object.lookup_linked_objects (link)
+      if obj1 and obj2 then
+         local obj3 = find_third_object (self, obj1, obj2)
+         if obj3 then
+            local d1 = self.objects[obj1].links
+            local d2 = self.objects[obj2].links
+            local d3 = self.objects[obj3].links
+            if (d3 > d1) or (d3 > d2) then
+               local origLink = link
+               self.links[place] = nil
+               if (d1 > d2) and not is_linked (obj1, obj3) then
+                  self.links[place] = dmz.object.link (NodeLinkHandle, obj1, obj3)
+               end
+               if not self.links[place] and (d3 > d1) and not is_linked (obj2, obj3) then
+                  self.links[place] = dmz.object.link (NodeLinkHandle, obj2, obj3)
+               end
+               if not self.links[place] then self.links[place] = origLink
+               else dmz.object.unlink (origLink)
+               end
+            end
+         end
+      end
+   else self.log:error ("No link found at: " .. place)
+   end
 end
 
 local function init_smallworld (self)
+   clear_canvas (self)
    for v = 1, self.objectCount, 1 do
       local obj = dmz.object.create (NodeType)
       dmz.object.position (obj, nil, random_position (self))
@@ -140,7 +208,11 @@ local function rank_nodes (self)
 end
 
 local function update_time_slice (self, time)
-   update_smallworld (self)
+   if self.reset then
+      self:init ()
+      self.reset = false
+   end
+   if self.active then self:update () end
    rank_nodes (self)
 end
 
@@ -154,12 +226,54 @@ local function unlink_objects (self, link, attr, super, sub)
    self.objects[sub].links = self.objects[sub].links - 1
 end
 
-
 local function start (self)
    self.handle = self.timeSlice:create (update_time_slice, self, self.name)
    local cb = { link_objects = link_objects, unlink_objects = unlink_objects, }
    self.objObs:register (NodeLinkHandle, cb, self)
-   init_smallworld (self);
+   self:init ();
+   self.msgObs:register (self.resetMessage, function (self) self.reset = true end, self)
+   self.msgObs:register (
+      self.updateNodeCountMessage,
+      function (self, msg, data)
+         if data then
+            self.reset = true
+            self.objectCount = data:lookup_number ("Float64", 1)
+         end
+      end,
+      self)
+   self.msgObs:register (
+      self.updateLinkCountMessage,
+      function (self, msg, data)
+         if data then
+            self.reset = true
+            self.linkCount = data:lookup_number ("Float64", 1)
+         end
+      end,
+      self)
+   self.msgObs:register (
+      self.activateSimMessage,
+      function (self, msg, data)
+         if data then
+            self.active = data:lookup_boolean ("Boolean", 1)
+         end
+      end,
+      self)
+   self.msgObs:register (
+      self.activateScaleFreeMessage,
+      function (self, msg, data)
+         self.reset = true
+         self.init = init_scalefree
+         self.update = update_scalefree
+      end,
+      self)
+   self.msgObs:register (
+      self.activateSmallWorldMessage,
+      function (self, msg, data)
+         self.reset = true
+         self.init = init_smallworld
+         self.update = update_smallworld
+      end,
+      self)
 end
 
 
@@ -172,11 +286,37 @@ function new (config, name)
    local self = {
       start_plugin = start,
       stop_plugin = stop,
+      init = init_scalefree,
+      update = update_scalefree,
       name = name,
       log = dmz.log.new ("lua." .. name),
       timeSlice = dmz.time_slice.new (),
       objObs = dmz.object_observer.new (),
+      msgObs = dmz.message_observer.new (name),
+      resetMessage = config:to_message ("reset-message.name", "Reset_Simulation_Message"),
+      updateNodeCountMessage =
+         config:to_message (
+            "update-node-count-message.name",
+            "Update_Node_Count_Message"),
+      updateLinkCountMessage =
+         config:to_message (
+            "update-link-count-message.name",
+            "Update_Link_Count_Message"),
+      activateSimMessage =
+         config:to_message (
+            "activate-simulation-message.name",
+            "Activate_Simulation_Message"),
+      activateScaleFreeMessage =
+         config:to_message (
+            "activate-scale-free-message.name",
+            "Activate_Scale_Free_Message"),
+      activateSmallWorldMessage =
+         config:to_message (
+            "activate-small-world-message.name",
+            "Activate_Small_World_Message"),
       config = config,
+      reset = false,
+      active = false,
       index = {},
       objects = {},
       links = {},

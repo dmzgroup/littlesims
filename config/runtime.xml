@@ -2,8 +2,10 @@
 <dmz>
 <runtime>
    <time>
-      <frequency value="60.0"/>
+      <frequency value="120.0"/>
    </time>
+   <message name="Update_Node_Count_Message" monostate="true"/>
+   <message name="Update_Link_Count_Message" monostate="true"/>
    <state name="LS_Small"/>
    <state name="LS_Medium"/>
    <state name="LS_Large"/>
