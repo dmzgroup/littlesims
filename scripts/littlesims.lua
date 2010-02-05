@@ -45,13 +45,20 @@ local function is_linked (obj1, obj2)
    return super[obj2] or sub[obj2]
 end
 
-local function find_third_object (self, obj1, obj2)
+local function find_third_object (self, obj1, obj2, minLinkCount)
+   if not minLinkCount then minLinkCount = 0 end
    local place = math.random (#self.index)
+   local start = place
+   local done = false
    local result = self.index[place]
-   while (result.handle == obj1) or (result.handle == obj2) do
+   while ((result.handle == obj1) or (result.handle == obj2)) and not done do
       place = place + 1
       if place > #self.index then place = 1 end
-      result = self.index[place]
+      if self.index[place].links >= minLinkCount then
+         result = self.index[place]
+         done = true
+      elseif place == start then done = true
+      end
    end
    return result.handle
 end
@@ -105,12 +112,27 @@ local function update_scalefree (self)
    if link then
       local attr, obj1, obj2 = dmz.object.lookup_linked_objects (link)
       if obj1 and obj2 then
-         local obj3 = find_third_object (self, obj1, obj2)
+         local obj3 = find_third_object (self, obj1, obj2, 1)
          if obj3 then
             local d1 = self.objects[obj1].links
             local d2 = self.objects[obj2].links
             local d3 = self.objects[obj3].links
             if (d3 > d1) or (d3 > d2) then
+               local origLink = link
+               self.links[place] = nil
+               if (d1 > d2) then
+                  if not is_linked (obj1, obj3) then
+                     self.links[place] = dmz.object.link (NodeLinkHandle, obj1, obj3)
+                  end
+               else
+                  if not is_linked (obj2, obj3) then
+                     self.links[place] = dmz.object.link (NodeLinkHandle, obj2, obj3)
+                  end
+               end
+               if not self.links[place] then self.links[place] = origLink
+               else dmz.object.unlink (origLink)
+               end
+--[[
                local origLink = link
                self.links[place] = nil
                if (d1 > d2) and not is_linked (obj1, obj3) then
@@ -122,6 +144,7 @@ local function update_scalefree (self)
                if not self.links[place] then self.links[place] = origLink
                else dmz.object.unlink (origLink)
                end
+--]]
             end
          end
       end
