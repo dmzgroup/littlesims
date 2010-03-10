@@ -1,8 +1,13 @@
 local NodeType = dmz.object_type.new ("ls_node")
 local NodeLinkHandle = dmz.handle.new ("Node_Link")
+local AngleHandle = dmz.handle.new ("Angle_Handle")
+local RadiusHandle = dmz.handle.new ("Radius_Handle")
 local SmallState = dmz.definitions.lookup_state ("LS_Small")
 local MediumState = dmz.definitions.lookup_state ("LS_Medium")
 local LargeState = dmz.definitions.lookup_state ("LS_Large")
+local MaxRadius = 280
+local HalfMaxRadius = MaxRadius * 0.5
+local NodeSpeed = 30
 
 local function local_random (min, max, offset)
    local result = 0
@@ -13,8 +18,9 @@ local function local_random (min, max, offset)
    return math.floor (result)
 end
 
-local function radius_position (angle)
-   return dmz.vector.new (math.sin (angle) * 280, 0, math.cos (angle) * 280)
+local function radius_position (angle, radius)
+   if not radius then radius = MaxRadius end
+   return dmz.vector.new (math.sin (angle) * radius, 0, math.cos (angle) * radius)
 end
 
 local function random_position (self)
@@ -85,13 +91,17 @@ local function init_scalefree (self)
    local offset = dmz.math.TwoPi / self.objectCount
    for v = 1, self.objectCount, 1 do
       local obj = dmz.object.create (NodeType)
-      dmz.object.position (obj, nil, radius_position (v * offset))
+      local angle = v * offset
+      dmz.object.scalar (obj, AngleHandle, angle)
+      dmz.object.scalar (obj, RadiusHandle, MaxRadius)
+      dmz.object.position (obj, nil, radius_position (angle))
       dmz.object.state (obj, nil, SmallState)
       self.index[v] = { handle = obj, links = 0 }
       self.objects[obj] = self.index[v]
       dmz.object.activate (obj)
       dmz.object.set_temporary (obj)
    end
+   self.realLinkCount = 0
    for v = 1, self.linkCount, 1 do
       local obj1 = math.random (self.objectCount)
       local obj2 = math.random (self.objectCount)
@@ -101,12 +111,13 @@ local function init_scalefree (self)
 
          if not is_linked (obj1, obj2) then
             self.links[#self.links + 1] = dmz.object.link (NodeLinkHandle, obj1, obj2)
+            self.realLinkCount = self.realLinkCount + 1
          end
       end
    end
 end
 
-local function update_scalefree (self)
+local function update_scalefree (self, time)
    local place = math.random (#self.links)
    local link = self.links[place]
    if link then
@@ -132,23 +143,36 @@ local function update_scalefree (self)
                if not self.links[place] then self.links[place] = origLink
                else dmz.object.unlink (origLink)
                end
---[[
-               local origLink = link
-               self.links[place] = nil
-               if (d1 > d2) and not is_linked (obj1, obj3) then
-                  self.links[place] = dmz.object.link (NodeLinkHandle, obj1, obj3)
-               end
-               if not self.links[place] and (d3 > d1) and not is_linked (obj2, obj3) then
-                  self.links[place] = dmz.object.link (NodeLinkHandle, obj2, obj3)
-               end
-               if not self.links[place] then self.links[place] = origLink
-               else dmz.object.unlink (origLink)
-               end
---]]
             end
          end
       end
    else self.log:error ("No link found at: " .. place)
+   end
+   local maxLinks = 0
+   local count = 0
+   for _, obj in ipairs (self.index) do
+      if obj.links > maxLinks then maxLinks = obj.links end
+      count = count + obj.links
+   end
+   if count < self.realLinkCount then
+self.log:error ("Link count wrong. Should be: " .. self.realLinkCount .. " is: " .. count)
+   end
+   if maxLinks > 0 then
+      for _, obj in ipairs (self.index) do
+         local ratio = (maxLinks - obj.links) / maxLinks
+         local radius = dmz.object.scalar (obj.handle, RadiusHandle)
+         local angle = dmz.object.scalar (obj.handle, AngleHandle)
+         local targetRadius = (ratio * HalfMaxRadius) + HalfMaxRadius
+         local diff = radius - targetRadius
+         if math.abs (diff) > NodeSpeed * time then
+            local mod = (diff >= 0) and 1 or -1
+            diff = NodeSpeed * time * mod
+            radius = radius - diff
+         else radius = targetRadius
+         end
+         dmz.object.scalar (obj.handle, RadiusHandle, radius)
+         dmz.object.position (obj.handle, nil, radius_position (angle, radius))
+      end
    end
 end
 
@@ -235,7 +259,7 @@ local function update_time_slice (self, time)
       self:init ()
       self.reset = false
    end
-   if self.active then self:update () end
+   if self.active then self:update (time) end
    rank_nodes (self)
 end
 

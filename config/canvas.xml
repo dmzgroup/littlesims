@@ -52,6 +52,9 @@
       <defaults zValue="1" itemIgnoresTransformations="false"/>
    </canvas-object-basic>
 </canvas-object>
+<canvas-link>
+   <pen-width value="1"/>
+</canvas-link>
 <degree-graph>
    <frame>
       <widget>
