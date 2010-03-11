@@ -154,7 +154,7 @@ local function update_scalefree (self, time)
       if obj.links > maxLinks then maxLinks = obj.links end
       count = count + obj.links
    end
-   if count < self.realLinkCount then
+   if count ~= (self.realLinkCount * 2) then
 self.log:error ("Link count wrong. Should be: " .. self.realLinkCount .. " is: " .. count)
    end
    if maxLinks > 0 then
