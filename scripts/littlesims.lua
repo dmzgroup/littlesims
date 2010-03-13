@@ -56,17 +56,20 @@ local function find_third_object (self, obj1, obj2, minLinkCount)
    local place = math.random (#self.index)
    local start = place
    local done = false
-   local result = self.index[place]
-   while ((result.handle == obj1) or (result.handle == obj2)) and not done do
-      place = place + 1
+   local result
+   while not done do
       if place > #self.index then place = 1 end
-      if self.index[place].links >= minLinkCount then
-         result = self.index[place]
+      local current = self.index[place]
+      if (current.handle ~= obj1) and (current.handle ~= obj2) and
+            (current.links >= minLinkCount) then
+         result = current
          done = true
-      elseif place == start then done = true
+      else
+         place = place + 1
+         if place == start then done = true end
       end
    end
-   return result.handle
+   return result and result.handle or 0
 end
 
 local function clear_canvas (self)
@@ -101,8 +104,11 @@ local function init_scalefree (self)
       dmz.object.activate (obj)
       dmz.object.set_temporary (obj)
    end
+   local count = 0
+   local loops = self.linkCount * 2
    self.realLinkCount = 0
-   for v = 1, self.linkCount, 1 do
+   local done = false
+   while not done do
       local obj1 = math.random (self.objectCount)
       local obj2 = math.random (self.objectCount)
       if obj1 ~= obj2 then
@@ -114,7 +120,12 @@ local function init_scalefree (self)
             self.realLinkCount = self.realLinkCount + 1
          end
       end
+      count = count + 1
+      if self.realLinkCount == self.linkCount then done = true
+      elseif loops <= count then done = true
+      end
    end
+   --self.log:error ("links: " .. self.realLinkCount .. " wanted: " .. self.linkCount)
 end
 
 local function update_scalefree (self, time)
@@ -128,6 +139,18 @@ local function update_scalefree (self, time)
             local d1 = self.objects[obj1].links
             local d2 = self.objects[obj2].links
             local d3 = self.objects[obj3].links
+            if (d3 > d1) and (d1 > d2) then
+               if not is_linked (obj1, obj3) then
+                  dmz.object.unlink (self.links[place])
+                  self.links[place] = dmz.object.link (NodeLinkHandle, obj1, obj3)
+               end
+            elseif (d3 > d2) and (d2 > d1) then
+               if not is_linked (obj2, obj3) then
+                  dmz.object.unlink (self.links[place])
+                  self.links[place] = dmz.object.link (NodeLinkHandle, obj2, obj3)
+               end
+            end
+--[[
             if (d3 > d1) or (d3 > d2) then
                local origLink = link
                self.links[place] = nil
@@ -144,6 +167,7 @@ local function update_scalefree (self, time)
                else dmz.object.unlink (origLink)
                end
             end
+--]]
          end
       end
    else self.log:error ("No link found at: " .. place)
