@@ -17,6 +17,14 @@
    </corners>
    <window title="DMZ: Little Sims"/>
    <central-widget name="canvas"/>
+   <menu-bar>
+      <menu text="&amp;File"/>
+<!--
+      <menu text="&amp;Edit"/>
+-->
+      <menu text="&amp;Window"/>
+      <menu text="&amp;Help"/>
+   </menu-bar>
    <dock-windows>
       <group area="bottom">
          <widget name="degree-graph" title="Degree Graph" visible="true" floating="true">
