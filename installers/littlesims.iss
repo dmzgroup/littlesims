@@ -24,9 +24,9 @@ UninstallFilesDir={app}\uninst
 OutputDir=.
 OutputBaseFilename=littlesimssetup
 ;OutputManifestFile=manifest.txt
-WizardImageFile=WizImage.bmp
-WizardSmallImageFile=WizSmallImage.bmp
-SetupIconFile=Setup.ico
+;WizardImageFile=WizImage.bmp
+;WizardSmallImageFile=WizSmallImage.bmp
+;SetupIconFile=Setup.ico
 Compression=lzma
 SolidCompression=yes
 

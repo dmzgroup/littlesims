@@ -7,4 +7,4 @@ INSTALLER_PATH=$DEPTH/installers
 if [ ! -d $INSTALLER_PATH ] ; then
    mkdir $INSTALLER_PATH
 fi
-cp littlesimssetup.exe $INSTALLER_PATH/MBRA-`cat $DEPTH/tmp/win32-opt/littlesimsapp/buildnumber.txt`.exe
+cp littlesimssetup.exe $INSTALLER_PATH/littlesims-`cat $DEPTH/tmp/win32-opt/littlesimsapp/buildnumber.txt`.exe
