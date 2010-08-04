@@ -10,7 +10,7 @@ lmk.add_vars {
 }
 lmk.add_files ({"version.xml",}, {src="version"})
 lmk.add_files {"littlesims.app"}
-lmk.add_preqs {"scripts", "littlesims", }
+lmk.add_preqs {"littlesims", }
 
 app.build_preqs {"config",}
 
