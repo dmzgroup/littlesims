@@ -5,6 +5,6 @@
    <config file="config/common.xml"/>
    <config file="config/canvas.xml"/>
    <config file="config/input.xml"/>
-   <config file="config/lua.xml"/>
+   <config file="config/js.xml"/>
    <config file="config/version.xml"/>
 </manifest>

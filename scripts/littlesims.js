@@ -1,0 +1,466 @@
+var dmz =
+   { object: require("dmz/components/object")
+   , objectType: require("dmz/runtime/objectType")
+   , defs: require("dmz/runtime/definitions")
+   , data: require("dmz/runtime/data")
+   , message: require("dmz/runtime/messaging")
+   , util: require("dmz/types/util")
+   }
+
+   , NodeType = dmz.objectType.lookup ("ls_node")
+   , NodeLinkHandle = dmz.defs.createNamedHandle("Node_Link")
+   , AngleHandle = dmz.defs.createNamedHandle("Angle_Handle")
+   , RadiusHandle = dmz.defs.createNamedHandle("Radius_Handle")
+   , SmallState = dmz.defs.lookupState("LS_Small")
+   , MediumState = dmz.defs.lookupState("LS_Medium")
+   , LargeState = dmz.defs.lookupState("LS_Large")
+   , MaxRadius = 280
+   , HalfMaxRadius = MaxRadius * 0.5
+   , NodeSpeed = 30
+   , startPlugin = initScaleFree
+   , stopPlugin = stop
+   , init = initScaleFree
+   , update = updateScaleFree
+   , timeSlice
+   , resetMessage = dmz.message.create(
+                    self.config.string(
+                       "reset-message.name",
+                       "Reset_Simulation_Message"))
+   , updateNodeCountMessage = dmz.message.create(
+                              self.config.string(
+                                 "update-node-count-message.name",
+                                 "Update_Node_Count_Message"))
+   , updateLinkCountMessage = dmz.message.create(
+                              self.config.string(
+                                 "update-link-count-message.name",
+                                 "Update_Link_Count_Message"))
+   , activateSimMessage = dmz.message.create(
+                          self.config.string(
+                             "activate-simulation-message.name",
+                             "Activate_Simulation_Message"))
+   , activateScaleFreeMessage = dmz.message.create(
+                                self.config.string(
+                                   "activate-scale-free-message.name",
+                                   "Activate_Scale_Free_Message"))
+   , activateSmallWorldMessage = dmz.message.create(
+                                 self.config.string(
+                                    "activate-small-world-message.name",
+                                    "Activate_Small_World_Message"))
+
+   , reset = false
+   , active = false
+   , index = {}
+   , objects = {}
+   , links = []
+   , grid
+   , min = { x: -300, y: -300 }
+   , max = { x: 280, y: 280 }
+   , offset = 20
+   , objectCount = 50
+   , linkCount = 100
+
+   , varRandom
+   , radiusPosition
+   , randomPosition
+   , isLinked
+   , findThirdObject
+   , clearCanvas
+   , initScaleFree
+   , updateScaleFree
+   , initSmallWorld
+   , updateSmallWorld
+   , rankNodes
+   , updateTimeSlice
+   , linkObjects
+   , unlinkObjects
+   , start
+   , stop
+   ;
+
+
+
+//      timeSlice = dmz.time_slice.new (),
+//      objObs = dmz.object_observer.new (),
+//      msgObs = dmz.message_observer.new (name),
+
+
+varRandom = function (min, max, offset) {
+   var result = 0
+   if (offset > 0) {
+      var range = Math.floor ((max - min) / offset)
+      result = dmz.util.randomInt (0, range - 1);
+   }
+   return Math.floor (result)
+};
+
+radiusPosition = function (angle, radius) {
+   if (!radius) { radius = MaxRadius; }
+   return dmz.vector.create (Math.sin (angle) * radius, 0, Math.cos (angle) * radius)
+};
+
+randomPosition = function () {
+   var x = 0
+     , y = 0
+     , done = false
+     ;
+
+   while (!done) {
+      x = varRandom (min.x, max.x, offset);
+      y = varRandom (min.y, max.y, offset);
+      if (!grid) { grid = {}; }
+      if (!grid[x]) { grid[x] = {}; }
+      if (!grid[x][y]) {
+         grid[x][y] = true;
+         done = true;
+      }
+   }
+   return dmz.vector.create (
+         (x * offset) + min.x + offset,
+         0,
+         (y * offset) + min.y + offset);
+};
+
+isLinked = function (obj1, obj2) {
+   var sub = dmz.object.subLinks (obj1, NodeLinkHandle)
+     , Super = dmz.object.superLinks (obj1, NodeLinkHandle)
+     ;
+   if (!sub) { sub = {}; }
+   if (!Super) { Super = {}; }
+   return Super[obj2] || sub[obj2];
+};
+
+findThirdObject = function (obj1, obj2, minLinkCount) {
+   var place = dmz.util.exportInt(0, index.length - 1)
+     , start = place
+     , done = false
+     , result
+     ;
+   if (!minLinkCount) { minLinkCount = 0; }
+   while (!done) {
+      if (place > index.length) { place = 0; }
+      var current = index[place];
+      if ((current.handle != obj1) && (current.handle != obj2) &&
+            (current.links >= minLinkCount)) {
+         result = current;
+         done = true;
+      }
+      else {
+         place += 1;
+         if (place == start) { done = true; }
+      }
+   }
+   return result ? result.handle : 0;
+};
+
+clearCanvas = function () {
+   var maxLinks
+     , data
+     ;
+
+   Object.keys(index).forEach (function (key) {
+      dmz.object.destroy (index[key].handle);
+   });
+   objects = {};
+   index = {};
+   links = []
+   delete grid;
+   maxLinks = Math.floor ((objectCount - 1) * 0.5 * objectCount * 0.8);
+   if (linkCount > maxLinks) {
+      linkCount = maxLinks;
+      data = dmz.data.create ();
+      data.number("Float64", 0, linkCount);
+      updateLinkCountMessage.send (data)
+   }
+}
+
+initScaleFree = function () {
+   var offset
+     , v
+     , obj
+     , angle
+     , count
+     , loops
+     , done
+     , obj1
+     , obj2
+     ;
+
+   clearCanvas ();
+   offset = dmz.Math.TwoPi / objectCount;
+
+   for (v = 0; v < objectCount; v += 1) {
+      obj = dmz.object.create (NodeType);
+      angle = v * offset;
+      dmz.object.scalar (obj, AngleHandle, angle);
+      dmz.object.scalar (obj, RadiusHandle, MaxRadius);
+      dmz.object.position (obj, null, radiusPosition (angle));
+      dmz.object.state (obj, null, SmallState);
+      index[v] = { handle: obj, links: 0 };
+      objects[obj] = index[v];
+      dmz.object.activate (obj);
+   }
+   count = 0
+   loops = linkCount * 2
+   realLinkCount = 0
+   done = false
+   while (!done) {
+      obj1 = dmz.util.randomInt (0, objectCount - 1);
+      obj2 = dmz.util.randomInt (0, objectCount - 1);
+      if (obj1 != obj2) {
+         obj1 = index[obj1].handle;
+         obj2 = index[obj2].handle;
+
+         if (!isLinked (obj1, obj2)) {
+            links.push (dmz.object.link(NodeLinkHandle, obj1, obj2));
+            realLinkCount += 1;
+         }
+      }
+      count += 1
+      if (realLinkCount == linkCount) { done = true; }
+      else if (loops <= count) { done = true; }
+   }
+}
+
+updateScaleFree = function (time) {
+   var place = dmz.util.randomInt (0, links.length - 1)
+     , link = links[place]
+     , attr
+     , obj1
+     , obj2
+     , obj3
+     , d1
+     , d2
+     , d3
+     , origLink
+     , maxLinks
+     , ratio
+     , radius
+     , angle
+     , targetRadius
+     , diff
+     , mod
+     , obj
+     ;
+   if (link) {
+      obj = dmz.object.linkedObjects (link);
+      attr = obj.attribute;
+      obj1 = obj.sub;
+      obj2 = obj.super;
+      if (obj1 && obj2) {
+         obj3 = findThirdObject (obj1, obj2, 1);
+         if (obj3) {
+            d1 = objects[obj1].links;
+            d2 = objects[obj2].links;
+            d3 = objects[obj3].links;
+            if ((d3 > d1) && (d1 > d2)) {
+               if (!isLinked (obj1, obj3)) {
+                  dmz.object.unlink (links[place]);
+                  links[place] = dmz.object.link (NodeLinkHandle, obj1, obj3);
+               }
+            }
+            else if ((d3 > d2) && (d2 > d1)) {
+               if (!isLinked (obj2, obj3)) {
+                  dmz.object.unlink (links[place]);
+                  links[place] = dmz.object.link (NodeLinkHandle, obj2, obj3);
+               }
+            }
+            if ((d3 > d1) || (d3 > d2)) {
+               origLink = link;
+               delete links[place];
+               if ((d1 > d2)) {
+                  if (!isLinked (obj1, obj3)) {
+                     links[place] = dmz.object.link (NodeLinkHandle, obj1, obj3);
+                  }
+               }
+               else if (!isLinked (obj2, obj3)) {
+                  links[place] = dmz.object.link (NodeLinkHandle, obj2, obj3);
+               }
+
+               if (!links[place]) { links[place] = origLink; }
+               else { dmz.object.unlink (origLink); }
+
+            }
+         }
+      }
+   }
+   else { self.log.error ("No link found at. " + place); }
+
+   maxLinks = 0;
+   count = 0;
+   Object.keys(index).forEach(function (key) {
+      if (index[key].links > maxLinks) { maxLinks = index[key].links; }
+      count += index[key].links;
+   });
+   if (count != (realLinkCount * 2)) {
+      self.log.error("Link count wrong. Should be. " + realLinkCount + " is. " + count);
+   }
+   if (maxLinks > 0) {
+      Object.keys(index).forEach(function (key) {
+         obj = index[key];
+         ratio = (maxLinks - obj.links) / maxLinks;
+         radius = dmz.object.scalar (obj.handle, RadiusHandle);
+         angle = dmz.object.scalar (obj.handle, AngleHandle);
+         targetRadius = (ratio * HalfMaxRadius) + HalfMaxRadius;
+         diff = radius - targetRadius;
+         if (Math.abs (diff) > NodeSpeed * time) {
+            mod = (diff >= 0) ? 1 : -1;
+            diff = NodeSpeed * time * mod;
+            radius = radius - diff;
+         }
+         else { radius = targetRadius; }
+         dmz.object.scalar (obj.handle, RadiusHandle, radius);
+         dmz.object.position (obj.handle, null, radiusPosition (angle, radius));
+      });
+   }
+};
+
+initSmallWorld = function () {
+   var v
+     , obj
+     , obj1
+     , obj2
+     ;
+   clearCanvas();
+   for (v = 0; v < objectCount; v += 1) {
+      obj = dmz.object.create (NodeType);
+      dmz.object.position (obj, null, randomPosition());
+      dmz.object.state (obj, null, SmallState);
+      index[v] = { handle: obj, links: 0 };
+      objects[obj] = index[v];
+      dmz.object.activate (obj);
+   }
+   for (v = 0; v < linkCount; v += 1) {
+      obj1 = dmz.util.randomInt (0, objectCount - 1);
+      obj2 = dmz.util.randomInt (0, objectCount - 1);
+      if (obj1 != obj2) {
+         obj1 = index[obj1].handle;
+         obj2 = index[obj2].handle;
+
+         if (!isLinked (obj1, obj2)) {
+            links.push(dmz.object.link (NodeLinkHandle, obj1, obj2));
+         }
+      }
+   }
+};
+
+updateSmallWorld = function () {
+   var place = dmz.util.randomInt (0, links.length - 1)
+     , link = links[place]
+     , attr
+     , obj1
+     , obj2
+     , v1
+     , v2
+     , v3
+     , d12
+     , d13
+     , d23
+     , origLink
+     ;
+
+   if (link) {
+      obj = dmz.object.linkedObjects (link);
+      attr = obj.attribute;
+      obj1 = obj.sub;
+      obj2 = obj.super;
+      if (obj1 && obj2) {
+         var obj3 = findThirdObject (obj1, obj2);
+         if (obj3) {
+            v1 = dmz.object.position (obj1);
+            v2 = dmz.object.position (obj2);
+            v3 = dmz.object.position (obj3);
+            if (v1 && v2 && v3) {
+               d12 = (v1 - v2).magnitude ();
+               d13 = (v1 - v3).magnitude ();
+               d23 = (v2 - v3).magnitude ();
+               if ((d12 > d13) || (d12 > d23)) {
+                  origLink = link;
+                  delete links[place];
+                  if ((d13 < d23) && !isLinked (obj1, obj3)) {
+                     links[place] = dmz.object.link (NodeLinkHandle, obj1, obj3);
+                  }
+                  if (!links[place] && (d23 < d12) && !isLinked (obj2, obj3)) {
+                     links[place] = dmz.object.link (NodeLinkHandle, obj2, obj3);
+                  }
+                  if (!links[place]) { links[place] = origLink; }
+                  else { dmz.object.unlink (origLink); }
+               }
+            }
+         }
+      }
+   }
+   else { self.log.error ("No link found at. " + place); }
+};
+
+rankNodes = function () {
+   var largeValue
+     , mediumValue
+     , state
+     , obj
+     ;
+
+   index.sort (function (obj1, obj2) {
+      return obj2.links - obj1.links;
+   });
+   largeValue = null
+   mediumValue = null
+   Object.keys(index).forEach(function (key) {
+      obj = index[key];
+      var state = SmallState;
+      if (!largeValue) { largeValue = obj.links; }
+      if (obj.links == largeValue) { state = LargeState; }
+      else if (!mediumValue) { mediumValue = obj.links; }
+      if (obj.links == mediumValue) { state = MediumState; }
+      dmz.object.state (obj.handle, null, state);
+   });
+};
+
+updateTimeSlice = function (time) {
+   if (reset) {
+      init ();
+      reset = false;
+   }
+   if (active) { update (time); }
+   rankNodes();
+};
+
+linkObjects = function (link, attr, Super, sub) {
+   objects[Super].links = objects[Super].links + 1;
+   objects[sub].links = objects[sub].links + 1;
+};
+
+unlinkObjects = function (link, attr, Super, sub) {
+   objects[Super].links = objects[Super].links - 1;
+   objects[sub].links = objects[sub].links - 1;
+};
+
+timeSlice = dmz.time.setRepeatingTimer (self, updateTimeSlice);
+
+dmz.object.link.observe (self, NodeLinkHandle, linkObjects);
+dmz.object.unlink.observe (self, NodeLinkHandle, unlinkObjects);
+
+resetMessage.subscribe (self, function () { reset = true; });
+
+updateNodeCountMessage (self, function (data) {
+   if (data) {
+      reset = true;
+      objectCount = data.number ("Float64", 0);
+   }
+});
+
+activateSimMessage (self, function (data) {
+   if (data) {
+      active = data.boolean ("Boolean", 0);
+   }
+});
+
+activateScaleFreeMessage (self, function (data) {
+   reset = true;
+   init = initScaleFree;
+   update = updateSmallWorld;
+});
+
+stop = function () {
+   if (timeSlice) { dmz.time.cancleTimer(self, timeSlice); }
+}
+

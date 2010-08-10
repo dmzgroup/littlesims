@@ -7,9 +7,9 @@
 </plugin-list>
 <dmzInputPluginKeyEventToMessage>
    <channel>
-      <converter key="L">
-         <target name="dmzQtExtLuaConsole" message="DMZ_Show_Lua_Console"/>
-      </converter>
+      <converter key="J">
+         <target name="dmzJsPluginV8ConsoleQt" message="DMZ_Show_Java_Script_Console"/>
+      </converter>  
    </channel>
 </dmzInputPluginKeyEventToMessage>
 </dmz>
