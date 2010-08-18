@@ -19,35 +19,32 @@ var dmz =
    , MaxRadius = 280
    , HalfMaxRadius = MaxRadius * 0.5
    , NodeSpeed = 30
-   , startPlugin = initScaleFree
-   , stopPlugin = stop
-   , init
-   , update
    , timeSlice
+
    , resetMessage = dmz.message.create(
-                    self.config.string(
-                       "reset-message.name",
-                       "Reset_Simulation_Message"))
+        self.config.string(
+           "reset-message.name",
+           "Reset_Simulation_Message"))
    , updateNodeCountMessage = dmz.message.create(
-                              self.config.string(
-                                 "update-node-count-message.name",
-                                 "Update_Node_Count_Message"))
+        self.config.string(
+           "update-node-count-message.name",
+           "Update_Node_Count_Message"))
    , updateLinkCountMessage = dmz.message.create(
-                              self.config.string(
-                                 "update-link-count-message.name",
-                                 "Update_Link_Count_Message"))
+        self.config.string(
+           "update-link-count-message.name",
+           "Update_Link_Count_Message"))
    , activateSimMessage = dmz.message.create(
-                          self.config.string(
-                             "activate-simulation-message.name",
-                             "Activate_Simulation_Message"))
+        self.config.string(
+           "activate-simulation-message.name",
+           "Activate_Simulation_Message"))
    , activateScaleFreeMessage = dmz.message.create(
-                                self.config.string(
-                                   "activate-scale-free-message.name",
-                                   "Activate_Scale_Free_Message"))
+        self.config.string(
+           "activate-scale-free-message.name",
+           "Activate_Scale_Free_Message"))
    , activateSmallWorldMessage = dmz.message.create(
-                                 self.config.string(
-                                    "activate-small-world-message.name",
-                                    "Activate_Small_World_Message"))
+        self.config.string(
+           "activate-small-world-message.name",
+           "Activate_Small_World_Message"))
 
    , reset = true
    , active = false
@@ -62,6 +59,8 @@ var dmz =
    , linkCount = 100
    , realLinkCount = 0
 
+   , init
+   , update
    , varRandom
    , radiusPosition
    , randomPosition
@@ -76,17 +75,7 @@ var dmz =
    , updateTimeSlice
    , linkObjects
    , unlinkObjects
-   , init
-   , start
-   , stop
    ;
-
-
-
-//      timeSlice = dmz.time_slice.new (),
-//      objObs = dmz.object_observer.new (),
-//      msgObs = dmz.message_observer.new (name),
-
 
 varRandom = function (min, max, offset) {
    var result = 0
@@ -119,29 +108,23 @@ randomPosition = function () {
       }
    }
    return dmz.vector.create (
-         (x * offset) + min.x + offset,
-         0,
-         (y * offset) + min.y + offset);
+      (x * offset) + min.x + offset,
+      0,
+      (y * offset) + min.y + offset);
 };
 
 isLinked = function (obj1, obj2) {
    var sub = dmz.object.subLinks (obj1, NodeLinkHandle)
-     , Super = dmz.object.superLinks (obj1, NodeLinkHandle)
+     , superLink = dmz.object.superLinks (obj1, NodeLinkHandle)
      , resultSub = false
      , resultSuper = false
      ;
-   if (!sub) { sub = []; }
-   else {
-      Object.keys(sub).forEach(function (key) {
-         if (sub[key] == obj2) { resultSub = true; }
-      });
+   if (sub) {
+      sub.forEach (function (key) { if (key === obj2) { resultSub = true; } });
    }
 
-   if (!Super) { Super = []; }
-   else {
-      Object.keys(Super).forEach(function (key) {
-         if (Super[key] == obj2) { resultSuper = true; }
-      });
+   if (superLink) {
+      superLink.forEach(function (key) { if (key === obj2) { resultSuper = true; } });
    }
 
    return resultSub || resultSuper;
@@ -166,7 +149,7 @@ findThirdObject = function (obj1, obj2, minLinkCount) {
       }
       else {
          place += 1;
-         if (place == start) { done = true; }
+         if (place === start) { done = true; }
       }
    }
    return result ? result.handle : 0;
@@ -183,7 +166,7 @@ clearCanvas = function () {
    objects = {};
    index = [];
    links = [];
-   delete grid;
+   grid = undefined;
    maxLinks = Math.floor ((objectCount - 1) * 0.5 * objectCount * 0.8);
    if (linkCount > maxLinks) {
       linkCount = maxLinks;
