@@ -271,21 +271,21 @@ updateScaleFree = function (time) {
                   links[place] = dmz.object.link (NodeLinkHandle, obj2, obj3);
                }
             }
-            if ((d3 > d1) || (d3 > d2)) {
-               origLink = link;
-               links[place] = -1;
-               if ((d1 > d2)) {
-                  if (!isLinked (obj1, obj3)) {
-                     links[place] = dmz.object.link (NodeLinkHandle, obj1, obj3);
-                  }
-               }
-               else if (!isLinked (obj2, obj3)) {
-                  links[place] = dmz.object.link (NodeLinkHandle, obj2, obj3);
-               }
+//            if ((d3 > d1) || (d3 > d2)) {
+//               origLink = link;
+//               links[place] = -1;
+//               if ((d1 > d2)) {
+//                  if (!isLinked (obj1, obj3)) {
+//                     links[place] = dmz.object.link (NodeLinkHandle, obj1, obj3);
+//                  }
+//               }
+//               else if (!isLinked (obj2, obj3)) {
+//                  links[place] = dmz.object.link (NodeLinkHandle, obj2, obj3);
+//               }
 
-               if (links[place] == -1) { links[place] = origLink; }
-               else { dmz.object.unlink (origLink); }
-            }
+//               if (links[place] === -1) { links[place] = origLink; }
+//               else { dmz.object.unlink (origLink); }
+//            }
          }
       }
    }
@@ -320,21 +320,21 @@ updateScaleFree = function (time) {
 };
 
 initSmallWorld = function () {
-   var v
+   var idx
      , obj
      , obj1
      , obj2
      ;
    clearCanvas();
-   for (v = 0; v < objectCount; v += 1) {
+   for (idx = 0; idx < objectCount; idx += 1) {
       obj = dmz.object.create (NodeType);
       dmz.object.position (obj, null, randomPosition());
       dmz.object.state (obj, null, SmallState);
-      index[v] = { handle: obj, links: 0 };
-      objects[obj] = index[v];
+      index[idx] = { handle: obj, links: 0 };
+      objects[obj] = index[idx];
       dmz.object.activate (obj);
    }
-   for (v = 0; v < linkCount; v += 1) {
+   for (idx = 0; idx < linkCount; idx += 1) {
       obj1 = dmz.util.randomInt (0, objectCount - 1);
       obj2 = dmz.util.randomInt (0, objectCount - 1);
       if (obj1 != obj2) {
@@ -388,7 +388,7 @@ updateSmallWorld = function () {
                   if (!links[place] && (d23 < d12) && !isLinked (obj2, obj3)) {
                      links[place] = dmz.object.link (NodeLinkHandle, obj2, obj3);
                   }
-                  if (links[place] == -1 || links[place] == undefined) {
+                  if (links[place] === -1 || links[place] == undefined) {
                      links[place] = origLink;
                   }
                   else { dmz.object.unlink (origLink); }
@@ -414,9 +414,9 @@ rankNodes = function () {
    index.forEach(function (obj) {
       state = SmallState;
       if (!largeValue) { largeValue = obj.links; }
-      if (obj.links == largeValue) { state = LargeState; }
+      if (obj.links === largeValue) { state = LargeState; }
       else if (!mediumValue) { mediumValue = obj.links; }
-      if (obj.links == mediumValue) { state = MediumState; }
+      if (obj.links === mediumValue) { state = MediumState; }
       dmz.object.state (obj.handle, null, state);
    });
 };
@@ -430,13 +430,13 @@ updateTimeSlice = function (time) {
    rankNodes();
 };
 
-linkObjects = function (link, attr, Super, sub) {
-   objects[Super].links += 1;
+linkObjects = function (link, attr, superNode, sub) {
+   objects[superNode].links += 1;
    objects[sub].links += 1;
 };
 
-unlinkObjects = function (link, attr, Super, sub) {
-   objects[Super].links -= 1;
+unlinkObjects = function (link, attr, superNode, sub) {
+   objects[superNode].links -= 1;
    objects[sub].links -= 1;
 };
 
@@ -478,10 +478,6 @@ activateSmallWorldMessage.subscribe (self, function (data) {
    init = initSmallWorld;
    update = updateSmallWorld;
 });
-
-stop = function () {
-   if (timeSlice) { dmz.time.cancleTimer(self, timeSlice); }
-}
 
 init = initScaleFree;
 update = updateScaleFree;
