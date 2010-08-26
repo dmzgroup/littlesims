@@ -202,10 +202,10 @@ initScaleFree = function () {
       objects[obj] = index[v];
       dmz.object.activate (obj);
    }
-   count = 0
-   loops = linkCount * 2
-   realLinkCount = 0
-   done = false
+   count = 0;
+   loops = linkCount * 2;
+   realLinkCount = 0;
+   done = false;
    while (!done) {
       obj1 = dmz.util.randomInt (0, objectCount - 1);
       obj2 = dmz.util.randomInt (0, objectCount - 1);
@@ -324,6 +324,9 @@ initSmallWorld = function () {
      , obj
      , obj1
      , obj2
+     , done
+     , count
+     , loops
      ;
    clearCanvas();
    for (idx = 0; idx < objectCount; idx += 1) {
@@ -334,7 +337,11 @@ initSmallWorld = function () {
       objects[obj] = index[idx];
       dmz.object.activate (obj);
    }
-   for (idx = 0; idx < linkCount; idx += 1) {
+   count = 0;
+   loops = linkCount * 2;
+   realLinkCount = 0;
+   done = false;
+   while (!done) {
       obj1 = dmz.util.randomInt (0, objectCount - 1);
       obj2 = dmz.util.randomInt (0, objectCount - 1);
       if (obj1 != obj2) {
@@ -345,6 +352,9 @@ initSmallWorld = function () {
             realLinkCount += 1;
          }
       }
+      count += 1
+      if (realLinkCount === linkCount) { done = true; }
+      else if (loops <= count) { done = true; }
    }
 };
 
