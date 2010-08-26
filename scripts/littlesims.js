@@ -218,7 +218,7 @@ initScaleFree = function () {
          }
       }
       count += 1
-      if (realLinkCount == linkCount) { done = true; }
+      if (realLinkCount === linkCount) { done = true; }
       else if (loops <= count) { done = true; }
    }
 }
@@ -388,7 +388,7 @@ updateSmallWorld = function () {
                   if (!links[place] && (d23 < d12) && !isLinked (obj2, obj3)) {
                      links[place] = dmz.object.link (NodeLinkHandle, obj2, obj3);
                   }
-                  if (links[place] === -1 || links[place] == undefined) {
+                  if ((links[place] === -1) || (links[place] === undefined)) {
                      links[place] = origLink;
                   }
                   else { dmz.object.unlink (origLink); }
