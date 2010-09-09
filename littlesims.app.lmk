@@ -25,7 +25,7 @@ app.copy_config {"$(localTmpDir)/version.xml",}
 
 app.add_data { "assets/", }
 
-app.add_scripts { "scripts/", }
+app.add_scripts { "scripts/", "../js/scripts/dmz", }
 
 lmk.add_vars ({
    installPaths = {
@@ -34,6 +34,7 @@ lmk.add_vars ({
       {"QtOpenGL.framework/Versions/4/QtOpenGL", "@executable_path/../Frameworks/Qt/QtOpenGL"},
       {"QtXml.framework/Versions/4/QtXml", "@executable_path/../Frameworks/Qt/QtXml"},
       {"QtSvg.framework/Versions/4/QtSvg", "@executable_path/../Frameworks/Qt/QtSvg"},
+      {"libv8.dylib", "@executable_path/../Frameworks/v8/libv8.dylib"},
    },
 }
 ,{opt = true})
