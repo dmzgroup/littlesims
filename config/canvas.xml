@@ -7,7 +7,7 @@
    <plugin name="dmzQtPluginCanvasLink" unique="canvas-link"/>
    <plugin name="dmzQtPluginGraph" unique="degree-graph"/>
    <plugin name="dmzQtPluginVersion"/>
-   <plugin name="dmzLittlesimsPluginControlsQt" unique="controls"/>
+   <!-- <plugin name="dmzLittlesimsPluginControlsQt" unique="controls"/> -->
 </plugin-list>
 <main-window>
    <fixed-size x="600" y="610"/>

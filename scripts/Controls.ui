@@ -141,7 +141,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QToolButton" name="pauseButton">
+      <widget class="QPushButton" name="pauseButton">
        <property name="text">
         <string>Start</string>
        </property>
@@ -161,7 +161,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QToolButton" name="resetButton">
+      <widget class="QPushButton" name="resetButton">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
          <horstretch>0</horstretch>

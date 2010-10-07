@@ -7,8 +7,15 @@ var dmz =
    , util: require("dmz/types/util")
    , time: require("dmz/runtime/time")
    , vector: require("dmz/types/vector")
+   , ui:
+      { loader: require("dmz/ui/uiLoader")
+      , mainWindow: require("dmz/ui/mainWindow")
+      , qt: require("dmz/ui")
+      }
    }
 
+   , ControlsForm = dmz.ui.loader.load("./scripts/Controls.ui")
+   , ControlsDock = dmz.ui.mainWindow.createDock ("Controls", ControlsForm)
    , NodeType = dmz.objectType.lookup ("ls_node")
    , NodeLinkHandle = dmz.defs.createNamedHandle("Node_Link")
    , AngleHandle = dmz.defs.createNamedHandle("Angle_Handle")
@@ -20,31 +27,6 @@ var dmz =
    , HalfMaxRadius = MaxRadius * 0.5
    , NodeSpeed = 30
    , timeSlice
-
-   , resetMessage = dmz.message.create(
-        self.config.string(
-           "reset-message.name",
-           "Reset_Simulation_Message"))
-   , updateNodeCountMessage = dmz.message.create(
-        self.config.string(
-           "update-node-count-message.name",
-           "Update_Node_Count_Message"))
-   , updateLinkCountMessage = dmz.message.create(
-        self.config.string(
-           "update-link-count-message.name",
-           "Update_Link_Count_Message"))
-   , activateSimMessage = dmz.message.create(
-        self.config.string(
-           "activate-simulation-message.name",
-           "Activate_Simulation_Message"))
-   , activateScaleFreeMessage = dmz.message.create(
-        self.config.string(
-           "activate-scale-free-message.name",
-           "Activate_Scale_Free_Message"))
-   , activateSmallWorldMessage = dmz.message.create(
-        self.config.string(
-           "activate-small-world-message.name",
-           "Activate_Small_World_Message"))
 
    , reset = true
    , active = false
@@ -170,9 +152,7 @@ clearCanvas = function () {
    maxLinks = Math.floor ((objectCount - 1) * 0.5 * objectCount * 0.8);
    if (linkCount > maxLinks) {
       linkCount = maxLinks;
-      data = dmz.data.create ();
-      data.number("Float64", 0, linkCount);
-      updateLinkCountMessage.send (data)
+      ControlsForm.lookup("linkSpinBox").value(linkCount);
    }
 }
 
@@ -455,39 +435,54 @@ timeSlice = dmz.time.setRepeatingTimer (self, updateTimeSlice);
 dmz.object.link.observe (self, NodeLinkHandle, linkObjects);
 dmz.object.unlink.observe (self, NodeLinkHandle, unlinkObjects);
 
-resetMessage.subscribe (self, function () { reset = true; });
+ControlsForm.observe(self, "resetButton", "clicked", function () { reset = true; });
 
-updateNodeCountMessage.subscribe (self, function (data) {
-   if (data) {
+
+ControlsForm.observe(self, "nodeSpinBox", "valueChanged", function (value, uiObject) {
+
+   if (objectCount !== value) {
       reset = true;
-      objectCount = data.number ("Float64", 0);
+      objectCount = value;
    }
 });
 
-updateLinkCountMessage.subscribe (self, function (data) {
-   if (data) {
+ControlsForm.observe(self, "linkSpinBox", "valueChanged", function (value, uiObject) {
+
+   if (linkCount !== value) {
       reset = true;
-      linkCount = data.number ("Float64", 0);
+      linkCount = value;
    }
 });
 
-activateSimMessage.subscribe (self, function (data) {
-   if (data) {
-      active = data.boolean ("Boolean", 0);
-   }
+ControlsForm.observe(self, "pauseButton", "clicked", function (btn) {
+
+   active = !active;
+   if (active) { btn.text("Pause"); }
+   else { btn.text("Start"); }
 });
 
-activateScaleFreeMessage.subscribe (self, function (data) {
+ControlsForm.observe(self, "simBox", "currentIndexChanged", function (value) {
+
    reset = true;
+   if (value === 0) {
+
+      init = initScaleFree;
+      update = updateScaleFree;
+   }
+   else {
+
+      init = initSmallWorld;
+      update = updateSmallWorld;
+   }
+});
+
+(function () {
+
    init = initScaleFree;
    update = updateScaleFree;
-});
-
-activateSmallWorldMessage.subscribe (self, function (data) {
-   reset = true;
-   init = initSmallWorld;
-   update = updateSmallWorld;
-});
-
-init = initScaleFree;
-update = updateScaleFree;
+   ControlsForm.lookup("linkSlider").value(linkCount);
+   ControlsForm.lookup("nodeSlider").value(objectCount);
+   ControlsForm.lookup("simBox").addItems(["Scale Free", "Small World"]);
+   ControlsForm.show();
+   dmz.ui.mainWindow.addDock("Controls", dmz.ui.qt.LeftDockWidgetArea);
+}());
