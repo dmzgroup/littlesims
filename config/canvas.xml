@@ -7,7 +7,6 @@
    <plugin name="dmzQtPluginCanvasLink" unique="canvas-link"/>
    <plugin name="dmzQtPluginGraph" unique="degree-graph"/>
    <plugin name="dmzQtPluginVersion"/>
-   <!-- <plugin name="dmzLittlesimsPluginControlsQt" unique="controls"/> -->
 </plugin-list>
 <main-window>
    <fixed-size x="600" y="610"/>
@@ -28,9 +27,6 @@
    <dock-windows>
       <group area="bottom">
          <widget name="degree-graph" title="Degree Graph" visible="true" floating="true">
-            <allowed-areas none="true"/>
-         </widget>
-         <widget name="controls" title="Controls" visible="true" floating="true">
             <allowed-areas none="true"/>
          </widget>
       </group>
@@ -85,8 +81,4 @@
       </fill>
    </bar>
 </degree-graph>
-<controls>
-   <sim name="Scale Free" message="Activate_Scale_Free_Message"/>
-   <sim name="Small World" message="Activate_Small_World_Message"/>
-</controls>
 </dmz>
