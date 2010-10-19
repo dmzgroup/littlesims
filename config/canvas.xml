@@ -58,6 +58,32 @@
    </plugin-list>
    <canvas-object-basic>
       <defaults zValue="1" itemIgnoresTransformations="false"/>
+      <template name="node">
+         <items>
+            <group name="base node">
+               <image name="small" resource="sm_node">
+                  <translate x="-9" y="-9"/>
+               </image>
+               <image name="medium" resource="med_node">
+                  <translate x="-10" y="-10"/>
+               </image>
+               <image name="large" resource="lg_node">
+                  <translate x="-16" y="-16"/>
+               </image>
+            </group>
+         </items>
+         <switch>
+            <state group="base node">
+               <item name="small"/>
+            </state>
+            <state name="LS_Medium" group="base node">
+               <item name="medium"/>
+            </state>
+            <state name="LS_Large" group="base node">
+               <item name="large"/>
+            </state>
+         </switch>
+      </template>
    </canvas-object-basic>
 </canvas-object>
 <canvas-link>
