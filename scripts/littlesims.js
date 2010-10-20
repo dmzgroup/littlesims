@@ -10,12 +10,16 @@ var dmz =
    , ui:
       { loader: require("dmz/ui/uiLoader")
       , mainWindow: require("dmz/ui/mainWindow")
-      , qt: require("dmz/ui")
+      , consts: require("dmz/ui/consts")
       }
    }
 
    , ControlsForm = dmz.ui.loader.load("./scripts/Controls.ui")
-   , ControlsDock = dmz.ui.mainWindow.createDock ("Controls", ControlsForm)
+   , ControlsDock = dmz.ui.mainWindow.createDock 
+     ("Controls"
+     , { area: dmz.ui.consts.LeftDockWidgetArea, floating: true }
+     , ControlsForm
+     )
    , NodeType = dmz.objectType.lookup ("ls_node")
    , NodeLinkHandle = dmz.defs.createNamedHandle("Node_Link")
    , AngleHandle = dmz.defs.createNamedHandle("Angle_Handle")
@@ -483,6 +487,4 @@ ControlsForm.observe(self, "simBox", "currentIndexChanged", function (value) {
    ControlsForm.lookup("linkSlider").value(linkCount);
    ControlsForm.lookup("nodeSlider").value(objectCount);
    ControlsForm.lookup("simBox").addItems(["Scale Free", "Small World"]);
-   ControlsForm.show();
-   dmz.ui.mainWindow.addDock("Controls", dmz.ui.qt.LeftDockWidgetArea);
 }());
