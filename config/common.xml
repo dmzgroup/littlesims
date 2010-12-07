@@ -3,9 +3,19 @@
 <plugin-list>
    <plugin name="dmzObjectModuleBasic"/>
    <plugin name="dmzPluginSaveMessageMonostate" scope="save-preferences"/>
+   <plugin name="dmzObjectModuleBasic"/>
+   <plugin name="dmzObjectModuleGridBasic"/>
+   <plugin name="dmzQtPluginObjectInspector"/>
 </plugin-list>
 <save-preferences>
    <message name="Update_Node_Count_Message"/>
    <message name="Update_Link_Count_Message"/>
 </save-preferences>
+<dmzObjectModuleGridBase>
+   <grid>
+      <cell x="10" y="10"/>
+      <min x="-300" y="0" z="-300"/>
+      <max x="300" y="0" z="300"/>
+   </grid>
+</dmzObjectModuleGridBase>
 </dmz>

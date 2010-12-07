@@ -23,5 +23,32 @@
          </template>
       </canvas-object-basic>
    </object-type>
+   <object-type name="mite_arena"/>
+   <object-type name="mite">
+      <canvas-object/>
+      <canvas-object-basic>
+         <items>
+            <image name="mite" resource="mite"/>
+         </items>
+         <switch>
+            <state>
+               <item name="mite"/>
+            </state>
+         </switch>
+      </canvas-object-basic>
+   </object-type>
+   <object-type name="chip">
+      <canvas-object/>
+      <canvas-object-basic>
+         <items>
+            <image name="chip" resource="chip"/>
+         </items>
+         <switch>
+            <state>
+               <item name="chip"/>
+            </state>
+         </switch>
+      </canvas-object-basic>
+   </object-type>
 </runtime>
 </dmz>

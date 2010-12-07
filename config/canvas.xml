@@ -9,7 +9,7 @@
    <plugin name="dmzQtPluginVersion"/>
 </plugin-list>
 <main-window>
-   <fixed-size x="600" y="610"/>
+   <fixed-size x="600" y="622"/>
    <corners>
       <top right="true" left="true"/>
       <bottom right="true" left="true"/>
