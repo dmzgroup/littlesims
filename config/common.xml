@@ -5,7 +5,7 @@
    <plugin name="dmzPluginSaveMessageMonostate" scope="save-preferences"/>
    <plugin name="dmzObjectModuleBasic"/>
    <plugin name="dmzObjectModuleGridBasic"/>
-   <plugin name="dmzQtPluginObjectInspector"/>
+<!--   <plugin name="dmzQtPluginObjectInspector"/> -->
 </plugin-list>
 <save-preferences>
    <message name="Update_Node_Count_Message"/>

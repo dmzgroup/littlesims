@@ -15,6 +15,7 @@ var dmz =
       }
    , util: require("dmz/types/util")
    , vector: require("dmz/types/vector")
+//   , graphlib: require("dmz/types/graph")
    }
 
 // UI windows
