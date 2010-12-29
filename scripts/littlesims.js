@@ -15,7 +15,7 @@ var dmz =
       }
    , util: require("dmz/types/util")
    , vector: require("dmz/types/vector")
-//   , graphlib: require("dmz/types/graph")
+   , graphlib: require("dmz/types/graph")
    }
 
 // UI windows
@@ -27,6 +27,19 @@ var dmz =
      , ControlsForm
      )
    , SpeedBox = ControlsForm.lookup("speedBox")
+   , GraphWindow = dmz.ui.loader.load("./scripts/GraphForm.ui")
+   , GraphDock = dmz.ui.mainWindow.createDock
+     ( "Graph"
+     , { area: dmz.ui.consts.BottomDockWidgetArea, floating: true }
+     , GraphWindow
+     )
+   , Graph = dmz.graphlib.createXYGraph
+     ( GraphWindow
+     , undefined
+     , undefined
+     , "Node Degree"
+     , "Percentage of Total"
+     )
 
 // Constant decls
 
@@ -773,14 +786,17 @@ rankNodes = function () {
    var largeValue
      , mediumValue
      , state
+     , counts = []
      ;
 
    index.sort (function (obj1, obj2) {
       return obj2.links - obj1.links;
    });
+
    largeValue = null
    mediumValue = null
    index.forEach(function (obj) {
+      counts.push (obj.links);
       state = SmallState;
       if (!largeValue) { largeValue = obj.links; }
       if (obj.links === largeValue) { state = LargeState; }
@@ -788,15 +804,19 @@ rankNodes = function () {
       if (obj.links === mediumValue) { state = MediumState; }
       dmz.object.state (obj.handle, null, state);
    });
+//   self.log.warn (counts);
+
+   Graph.updateDegreeGraph(counts.reverse(), true);
 };
 
 updateTimeSlice = function (time) {
    if (reset) {
       init ();
       reset = false;
+      rankNodes();
    }
-   if (active) { update(time); }
-   rankNodes();
+   if (active) { update(time); rankNodes(); }
+//   rankNodes();
 };
 
 linkObjects = function (link, attr, superNode, sub) {
