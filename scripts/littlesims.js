@@ -28,18 +28,74 @@ var dmz =
      )
    , SpeedBox = ControlsForm.lookup("speedBox")
    , GraphWindow = dmz.ui.loader.load("./scripts/GraphForm.ui")
+   , GraphStackWidget = GraphWindow.lookup("stackedWidget")
    , GraphDock = dmz.ui.mainWindow.createDock
      ( "Graph"
      , { area: dmz.ui.consts.BottomDockWidgetArea, floating: true }
      , GraphWindow
      )
-   , Graph = dmz.graphlib.createXYGraph
-     ( GraphWindow
-     , undefined
-     , undefined
+   , simGraph = dmz.graphlib.createXYGraph
+     ( GraphWindow.lookup("simsGraphicsView")
+     , 0
+     , 0
      , "Node Degree"
-     , "Percentage of Total"
+     , "Percentage of Total Degree"
+     , 0
+     , false
+     , { r: 0, b: 0, g: 0.1 }
+     , { r: 0, b: 0, g: 0.9 }
+     , 20
      )
+   , mitesGraph = dmz.graphlib.createXYGraph
+     ( GraphWindow.lookup("mitesGraphicsView")
+     , 1
+     , 4
+     , "Mites X Axis"
+     , "Mites Y Axis"
+     , 45
+     , true
+     , { r: 0, b: 0, g: 1 }
+     , { r: 0.5, b: 0.5, g: 1 }
+     , 20
+     , 80
+     , 5
+     )
+   , mbraData = [0,95.77464788732394,85.91549295774648,79.92957746478872,74.29577464788731,70.4225352112676,65.49295774647887,64.08450704225352,61.97183098591549,61.97183098591549,61.61971830985915,61.61971830985915,61.61971830985915,61.267605633802816,61.267605633802816,61.267605633802816,60.56338028169014,60.2112676056338,60.2112676056338,60.2112676056338,60.2112676056338,60.2112676056338,60.2112676056338,59.859154929577464,59.859154929577464,59.859154929577464,59.859154929577464,59.859154929577464,59.859154929577464,58.098591549295776,51.40845070422535,45.774647887323944,42.6056338028169,38.38028169014084,32.74647887323944,26.408450704225352,23.239436619718308,18.661971830985916,16.901408450704224,15.492957746478872,14.084507042253518,13.732394366197182,13.028169014084506,11.619718309859154,9.507042253521124,9.154929577464788,8.80281690140845,8.80281690140845,8.80281690140845,8.098591549295774,7.746478873239436,7.042253521126759,5.28169014084507,4.577464788732394,3.873239436619718,3.5211267605633796,3.5211267605633796,3.5211267605633796,3.5211267605633796,3.5211267605633796,2.816901408450704,2.464788732394366,2.112676056338028,2.112676056338028,2.112676056338028,1.7605633802816902,1.7605633802816902,1.4084507042253522,1.056338028169014,1.056338028169014,1.056338028169014,1.056338028169014,1.056338028169014,0.7042253521126761,0.7042253521126761,0.7042253521126761,0.7042253521126761,0.35211267605633806,0.35211267605633806,0.35211267605633806,0.35211267605633806,0.35211267605633806,0.35211267605633806,0.35211267605633806,0.35211267605633806,0.35211267605633806,0.35211267605633806,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+
+//Littlesims graph settings
+
+//     <set>
+//        <object-type name="ls_node"/>
+//     </set>
+//     <attribute type="link" name="Node_Link"/>
+//     <bar>
+//        <stroke>
+//           <color green="0.1"/>
+//        </stroke>
+//        <fill>
+//           <color red="0.0" green="0.9" blue="0.0"/>
+//        </fill>
+//     </bar>
+
+
+//  Mites Graph settings
+
+//     <attribute name="Chip_Count" type="counter"/>
+//     <power-law show="true">
+//        <stroke>
+//           <color red="0.8"/>
+//        </stroke>
+//     </power-law>
+//     <bar height="80" width="20" space="5" divisions="4">
+//        <stroke>
+//           <color green="1"/>
+//        </stroke>
+//        <fill>
+//           <color red="0.5" green="1" blue="0.5"/>
+//        </fill>
+//     </bar>
+
 
 // Constant decls
 
@@ -299,6 +355,8 @@ initScaleFree = function () {
       if (realLinkCount === linkCount) { done = true; }
       else if (loops <= count) { done = true; }
    }
+
+   rankNodes();
 }
 
 init = initScaleFree;
@@ -349,21 +407,6 @@ updateScaleFree = function (time) {
                   links[place] = dmz.object.link (NodeLinkHandle, obj2, obj3);
                }
             }
-//            if ((d3 > d1) || (d3 > d2)) {
-//               origLink = link;
-//               links[place] = -1;
-//               if ((d1 > d2)) {
-//                  if (!isLinked (obj1, obj3)) {
-//                     links[place] = dmz.object.link (NodeLinkHandle, obj1, obj3);
-//                  }
-//               }
-//               else if (!isLinked (obj2, obj3)) {
-//                  links[place] = dmz.object.link (NodeLinkHandle, obj2, obj3);
-//               }
-
-//               if (links[place] === -1) { links[place] = origLink; }
-//               else { dmz.object.unlink (origLink); }
-//            }
          }
       }
    }
@@ -395,6 +438,8 @@ updateScaleFree = function (time) {
          dmz.object.position (obj.handle, null, radiusPosition (angle, radius));
       });
    }
+
+   rankNodes();
 };
 
 initSmallWorld = function () {
@@ -434,6 +479,8 @@ initSmallWorld = function () {
       if (realLinkCount === linkCount) { done = true; }
       else if (loops <= count) { done = true; }
    }
+
+   rankNodes();
 };
 
 updateSmallWorld = function () {
@@ -486,6 +533,8 @@ updateSmallWorld = function () {
       }
    }
    else { self.log.error ("No link found at. " + place); }
+
+   rankNodes();
 };
 
 initMites = function () {
@@ -494,22 +543,21 @@ initMites = function () {
      , chip
      ;
 
-   ClusterSphere.radius(80);
-   HaulSphere.radius(8);
+   ClusterSphere.radius(96);
+   HaulSphere.radius(9.6);
 
    clearCanvas();
 
-   // Move these two while loops to clearCanvas code.
-
    updateObjectCount();
    updateLinkCount();
+   updateChipClusters ();
 }
 
 updateMiteSimulation = function (time) {
 
    updateMites (time);
-   updateChipClusters (time);
    updateHaul (time);
+   updateChipClusters ();
 }
 
 calcNextTurnTime = function (delay) {
@@ -671,7 +719,7 @@ findChipCluster = function (chips, chip) {
          if (!chips[chipHandle]) {
 
             type = dmz.object.type (chipHandle);
-            if (type && type.isOfType(ChipType)) { result.push(chip); }
+            if (type && type.isOfType(ChipType)) { result.push(chipHandle); }
             chips[chipHandle] = true;
          }
       });
@@ -685,6 +733,8 @@ updateChipClusters = function () {
      , clusters = []
      , chip
      , index
+//     , count = {}
+     , count = []
      ;
 
    Chips.forEach(function (chip) {
@@ -695,13 +745,18 @@ updateChipClusters = function () {
          clusters.push(findChipCluster (chips, chip))
       }
    });
-   clusters.sort(function (obj1, obj2) { return obj2.length > obj1.length; });
-   for (index = 0; index < clusters.length; index += 1) {
 
-      clusters[index].forEach(function (chip) {
-         dmz.object.counter (chip, CountHandle, index);
-      });
+   clusters.forEach(function (cluster) {
+
+      count[cluster.length] = count[cluster.length] ? count[cluster.length] + 1 : 1;
+   });
+
+   for (index = 0; index < count.length; index += 1) {
+
+      if (!count[index]) { count[index] = 0; }
    }
+
+   mitesGraph.update(count, function (idx, values) { return values[idx] / linkCount; });
 }
 
 findNearestChip = function (pos) {
@@ -783,10 +838,12 @@ updateHaul = function (time) {
 }
 
 rankNodes = function () {
+
    var largeValue
      , mediumValue
      , state
      , counts = []
+     , idx
      ;
 
    index.sort (function (obj1, obj2) {
@@ -796,7 +853,8 @@ rankNodes = function () {
    largeValue = null
    mediumValue = null
    index.forEach(function (obj) {
-      counts.push (obj.links);
+//      counts.push (obj.links);
+      counts[obj.links] = counts[obj.links] ? counts[obj.links] + 1 : 1;
       state = SmallState;
       if (!largeValue) { largeValue = obj.links; }
       if (obj.links === largeValue) { state = LargeState; }
@@ -804,19 +862,21 @@ rankNodes = function () {
       if (obj.links === mediumValue) { state = MediumState; }
       dmz.object.state (obj.handle, null, state);
    });
-//   self.log.warn (counts);
 
-   Graph.updateDegreeGraph(counts.reverse(), true);
+   for (idx = 0; idx < objectCount; idx += 1) {
+
+      if (!counts[idx]) { counts[idx] = 0; }
+   }
+
+   simGraph.update(counts, function(idx, values) { return values[idx] / objectCount; });
 };
 
 updateTimeSlice = function (time) {
    if (reset) {
       init ();
       reset = false;
-      rankNodes();
    }
-   if (active) { update(time); rankNodes(); }
-//   rankNodes();
+   if (active) { update(time); }
 };
 
 linkObjects = function (link, attr, superNode, sub) {
@@ -873,16 +933,19 @@ ControlsForm.observe(self, "simBox", "currentIndexChanged", function (value) {
 
       init = initScaleFree;
       update = updateScaleFree;
+      GraphStackWidget.currentIndex(0);
    }
    else if (value === 1) {
 
       init = initSmallWorld;
       update = updateSmallWorld;
+      GraphStackWidget.currentIndex(0);
    }
    else if (value === 2) {
 
       init = initMites;
       update = updateMiteSimulation;
+      GraphStackWidget.currentIndex(1);
    }
 });
 
@@ -893,6 +956,6 @@ ControlsForm.observe(self, "simBox", "currentIndexChanged", function (value) {
    update = updateScaleFree;
    ControlsForm.lookup("linkSlider").value(linkCount);
    ControlsForm.lookup("nodeSlider").value(objectCount);
-   ControlsForm.lookup("nodeSlider").value(NodeSpeed);
+   ControlsForm.lookup("speedSlider").value(NodeSpeed);
    ControlsForm.lookup("simBox").addItems(["Scale Free", "Small World", "Mites"]);
 }());

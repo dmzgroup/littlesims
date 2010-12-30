@@ -5,7 +5,6 @@
    <plugin name="dmzQtModuleCanvasBasic" unique="canvas"/>
    <plugin name="dmzQtPluginCanvasObject" unique="canvas-object"/>
    <plugin name="dmzQtPluginCanvasLink" unique="canvas-link"/>
-   <plugin name="dmzQtPluginGraph" unique="degree-graph"/>
    <plugin name="dmzQtPluginVersion"/>
 </plugin-list>
 <main-window>
@@ -24,13 +23,6 @@
       <menu text="&amp;Window"/>
       <menu text="&amp;Help"/>
    </menu-bar>
-   <dock-windows>
-      <group area="bottom">
-         <widget name="degree-graph" title="Degree Graph" visible="true" floating="true">
-            <allowed-areas none="true"/>
-         </widget>
-      </group>
-   </dock-windows>
 </main-window>
 <canvas>
    <frame>
@@ -85,26 +77,4 @@
 <canvas-link>
    <pen-width value="1"/>
 </canvas-link>
-<degree-graph>
-   <frame>
-      <widget>
-         <minimum-size width="600" height="250"/>
-      </widget>
-   </frame>
-   <start value="0"/>
-   <ascending value="true"/>
-   <percents show="true"/>
-   <set>
-      <object-type name="ls_node"/>
-   </set>
-   <attribute type="link" name="Node_Link"/>
-   <bar>
-      <stroke>
-         <color green="0.1"/>
-      </stroke>
-      <fill>
-         <color red="0.0" green="0.9" blue="0.0"/>
-      </fill>
-   </bar>
-</degree-graph>
 </dmz>
