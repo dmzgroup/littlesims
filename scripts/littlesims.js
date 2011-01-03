@@ -49,9 +49,9 @@ var dmz =
    , mitesGraph = dmz.graphlib.createXYGraph
      ( GraphWindow.lookup("mitesGraphicsView")
      , 1
-     , 4
-     , "Mites X Axis"
-     , "Mites Y Axis"
+     , 0
+     , "Clusters sorted by size"
+     , "# Nodes in Cluster"
      , 45
      , true
      , { r: 0, b: 0, g: 1 }
@@ -118,8 +118,8 @@ var dmz =
      , CountHandle = dmz.defs.createNamedHandle ("Chip_Count")
      , ChipOffset = dmz.vector.create (0, 0, -14)
      , UnitMatrix = dmz.matrix.create ()
-     , MaxTurn = Math.PI / 2
-     , TurnDelay = 3
+     , MaxTurn = Math.PI
+     , TurnDelay = 0.2
      , Speed = 300
      , WaitTime = 1
 
@@ -733,7 +733,6 @@ updateChipClusters = function () {
      , clusters = []
      , chip
      , index
-//     , count = {}
      , count = []
      ;
 
@@ -746,17 +745,17 @@ updateChipClusters = function () {
       }
    });
 
-   clusters.forEach(function (cluster) {
+   clusters.sort(function (obj1, obj2) { return obj2.length - obj1.length; });
 
-      count[cluster.length] = count[cluster.length] ? count[cluster.length] + 1 : 1;
-   });
+   // Mites graph labels start at "1", so add a value to the front of the array
+   // in order to align labels and values correctly.
+   clusters.unshift(0);
 
-   for (index = 0; index < count.length; index += 1) {
-
-      if (!count[index]) { count[index] = 0; }
-   }
-
-   mitesGraph.update(count, function (idx, values) { return values[idx] / linkCount; });
+   mitesGraph.update
+      ( clusters
+      , function (idx, values) { return values[idx].length / linkCount; }
+      , function (idx, values, value) { return values[idx].length.toString(); }
+      );
 }
 
 findNearestChip = function (pos) {
@@ -782,7 +781,8 @@ findNearestChip = function (pos) {
          if (object) {
 
             type = dmz.object.type(object);
-            if (type && type.isOfType(ChipType) && ChipHandleMap[object]) {
+            if (type && type.isOfType(ChipType) && ChipHandleMap[object] &&
+               (ChipHandleMap[object].mite === false)) {
 
                result = object;
                done = true;
@@ -816,7 +816,8 @@ updateHaul = function (time) {
          if (timer <= ctime) {
 
             ori = mite.ori;
-            pos = mite.pos;
+            if (!ori) { ori = UnitMatrix; }
+            pos = mite.pos.add(ori.transform (ChipOffset));
             chip = ChipHandleMap[findNearestChip(pos)];
             if (chip) {
 
@@ -853,7 +854,6 @@ rankNodes = function () {
    largeValue = null
    mediumValue = null
    index.forEach(function (obj) {
-//      counts.push (obj.links);
       counts[obj.links] = counts[obj.links] ? counts[obj.links] + 1 : 1;
       state = SmallState;
       if (!largeValue) { largeValue = obj.links; }
