@@ -23,7 +23,9 @@ var dmz =
    , ControlsForm = dmz.ui.loader.load("./scripts/Controls.ui")
    , ControlsDock = dmz.ui.mainWindow.createDock
      ("Controls"
-     , { area: dmz.ui.consts.LeftDockWidgetArea, floating: true }
+     , { area: dmz.ui.consts.RightDockWidgetArea
+       , floating: true
+       }
      , ControlsForm
      )
    , SpeedBox = ControlsForm.lookup("speedBox")
@@ -56,7 +58,7 @@ var dmz =
      , true
      , { r: 0, b: 0, g: 1 }
      , { r: 0.5, b: 0.5, g: 1 }
-     , 20
+     , 15
      , 80
      , 5
      )
@@ -543,7 +545,7 @@ initMites = function () {
      , chip
      ;
 
-   ClusterSphere.radius(96);
+   ClusterSphere.radius(110);
    HaulSphere.radius(9.6);
 
    clearCanvas();

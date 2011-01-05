@@ -8,7 +8,7 @@
    <plugin name="dmzQtPluginVersion"/>
 </plugin-list>
 <main-window>
-   <fixed-size x="600" y="622"/>
+<!--   <fixed-size x="600" y="622"/> -->
    <corners>
       <top right="true" left="true"/>
       <bottom right="true" left="true"/>
@@ -25,12 +25,14 @@
    </menu-bar>
 </main-window>
 <canvas>
+<!--
    <frame>
       <widget>
          <minimum-size width="600" height="600"/>
       </widget>
    </frame>
-   <canvas opengl="false" antialiasing="true" textantialiasing="true">
+   -->
+   <canvas opengl="true" antialiasing="true" textantialiasing="true">
       <zoom default="1.0"/>
    </canvas>
    <scene>
