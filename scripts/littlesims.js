@@ -949,6 +949,12 @@ ControlsForm.observe(self, "simBox", "currentIndexChanged", function (value) {
    }
 });
 
+GraphWindow.observe(self, "exportButton", "clicked", function (button) {
+
+   self.log.warn ("Export");
+   if (init == initMites) { mitesGraph.export(button); }
+   else { simGraph.export(button); }
+});
 
 (function () {
 
