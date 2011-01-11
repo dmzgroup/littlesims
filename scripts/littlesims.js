@@ -47,6 +47,7 @@ var dmz =
      , { r: 0, b: 0, g: 0.1 }
      , { r: 0, b: 0, g: 0.9 }
      , 20
+     , 80
      )
    , mitesGraph = dmz.graphlib.createXYGraph
      ( GraphWindow.lookup("mitesGraphicsView")
@@ -718,9 +719,10 @@ updateChipClusters = function () {
    clusters.unshift(0);
 
    mitesGraph.update
-      ( clusters
-      , function (idx, values) { return values[idx].length / linkCount; }
+      ( function (idx, values) { return values[idx].length / linkCount; }
       , function (idx, values, value) { return values[idx].length.toString(); }
+      , undefined
+      , clusters
       );
 }
 
@@ -834,7 +836,13 @@ rankNodes = function () {
       if (!counts[idx]) { counts[idx] = 0; }
    }
 
-   simGraph.update(counts, function(idx, values) { return values[idx] / objectCount; });
+   simGraph.update
+
+      ( function(idx, values) { return values[idx] / objectCount; }
+      , undefined
+      , undefined
+      , counts
+      );
 };
 
 updateTimeSlice = function (time) {
