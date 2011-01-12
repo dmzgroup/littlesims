@@ -46,6 +46,7 @@ var dmz =
      , false
      , { r: 0, b: 0, g: 0.1 }
      , { r: 0, b: 0, g: 0.9 }
+     , undefined
      , 20
      , 80
      )
@@ -59,6 +60,7 @@ var dmz =
      , true
      , { r: 0, b: 0, g: 1 }
      , { r: 0.5, b: 0.5, g: 1 }
+     , undefined
      , 15
      , 80
      , 5
@@ -721,7 +723,6 @@ updateChipClusters = function () {
    mitesGraph.update
       ( function (idx, values) { return values[idx].length / linkCount; }
       , function (idx, values, value) { return values[idx].length.toString(); }
-      , undefined
       , clusters
       );
 }
@@ -839,7 +840,6 @@ rankNodes = function () {
    simGraph.update
 
       ( function(idx, values) { return values[idx] / objectCount; }
-      , undefined
       , undefined
       , counts
       );
