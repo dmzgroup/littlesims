@@ -57,4 +57,5 @@ Source: {#DependDir}\bin\QtGui4.dll; DestDir: {app}\bin
 Source: {#DependDir}\bin\QtOpenGL4.dll; DestDir: {app}\bin
 Source: {#DependDir}\bin\QtSvg4.dll; DestDir: {app}\bin
 Source: {#DependDir}\bin\QtXml4.dll; DestDir: {app}\bin
+Source: {#DependDir}\bin\v8.dll; DestDir: {app}\bin
 Source: {#VsDir}\VC\redist\x86\Microsoft.VC80.CRT\*; DestDir: {app}\bin\Microsoft.VC80.CRT

@@ -16,28 +16,36 @@
    <object-type name="ls_node">
       <canvas-object/>
       <canvas-object-basic>
+         <template name="node">
+            <var name="sm_node" value="small node"/>
+            <var name="med_node" value="medium node"/>
+            <var name="lg_node" value="large node"/>
+         </template>
+      </canvas-object-basic>
+   </object-type>
+   <object-type name="mite_arena"/>
+   <object-type name="mite">
+      <canvas-object/>
+      <canvas-object-basic>
          <items>
-            <group name="base node">
-               <image name="small" resource="small node">
-                  <translate x="-9" y="-9"/>
-               </image>
-               <image name="medium" resource="medium node">
-                  <translate x="-10" y="-10"/>
-               </image>
-               <image name="large" resource="large node">
-                  <translate x="-16" y="-16"/>
-               </image>
-            </group>
+            <image name="mite" resource="mite"/>
          </items>
          <switch>
-            <state group="base node">
-               <item name="small"/>
+            <state>
+               <item name="mite"/>
             </state>
-            <state name="LS_Medium" group="base node">
-               <item name="medium"/>
-            </state>
-            <state name="LS_Large" group="base node">
-               <item name="large"/>
+         </switch>
+      </canvas-object-basic>
+   </object-type>
+   <object-type name="chip">
+      <canvas-object/>
+      <canvas-object-basic>
+         <items>
+            <image name="chip" resource="chip"/>
+         </items>
+         <switch>
+            <state>
+               <item name="chip"/>
             </state>
          </switch>
       </canvas-object-basic>

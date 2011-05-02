@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dmz>
+<dmzObjectModuleGridBasic>
+   <grid>
+      <cell x="50" y="50"/>
+      <min x="-300" y="0" z="-300"/>
+      <max x="300" y="0" z="300"/>
+   </grid>
+</dmzObjectModuleGridBasic>
+<archive>
+   <object type="mite_arena">
+      <attributes name="Minimum_Area">
+         <position x="-300" y="0" z="-300"/>
+      </attributes>
+      <attributes name="Maximum_Area">
+         <position x="300" y="0" z="300"/>
+      </attributes>
+      <attributes name="Mites">
+         <counter value="15"/>
+      </attributes>
+      <attributes name="Speed">
+         <scalar value="300"/>
+      </attributes>
+      <attributes name="Wait">
+         <scalar value="1"/>
+      </attributes>
+      <attributes name="Chips">
+         <counter value="50"/>
+      </attributes>
+      <attributes name="Turn">
+         <scalar value="3.141592653589793"/>
+      </attributes>
+      <attributes name="TurnDelay">
+         <scalar value="0.2"/>
+      </attributes>
+   </object>
+</archive>
+</dmz>
